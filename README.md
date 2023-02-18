@@ -2,7 +2,7 @@
 
 This is a Spring Boot application that provides two APIs for getting a token and posting data.
 
-#Requirements
+## Requirements
 
 To run this application, you will need to have the following installed on your system:
 
@@ -10,182 +10,286 @@ To run this application, you will need to have the following installed on your s
 2. Maven 3.6 or later
 3. MySQL 8 or later
 
-#Installation
+## Installation
 
 To install and run this application, follow these steps:
 
 Clone this repository to your local machine: 
-
+```
 https://github.com/gade789/N-18-02-2023-Gade.git
-
+```
 Build the application using Maven:
-
+```
 mvn clean package
-
+```
 Run the application using Maven:
-
+```
 mvn spring-boot:run
+```
 This will start the application on port 8081.
 
-#Usage
+## Usage
 
+A)
 
-POST /service/v1/token
+**POST /service/v1/token**
+
 This API generates a token based on the provided username and password.
-it generate token using User_id and encode it with user using JWT Tokenenizer
 
-Request
+It will generate token using JWT Token and encode User_id with generated token.
 
-POST /service/v1/token HTTP/1.1
+Token will last for `5 mins` if time is exceeded token will be expired.
+
+> Request:
+
+POST /service/v1/token    
+
+HTTP/1.1
+
 Host: localhost:8081
+
 Content-Type: application/json
 
+```
 {
-    "username": "myusername",
-    "password": "mypassword"
+    "username": "my_username",
+    "password": "my_password"
 }
+```
 
-Response
-If the request is successful, the API returns a JSON object containing the generated token:
+> Response:
 
-HTTP/1.1 200 OK
+  -  If the request is successful, the API returns a JSON object containing the generated token:
+
+HTTP/1.1 
+
+200 OK
+
 Content-Type: application/json
 
+```
 {
-    "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 }
+```
 
-If the request is unsuccessful, the API returns an error message:
+  -  If the username is not matched, the API returns an error message:
 
-HTTP/1.1 401 Unauthorized
-Content-Type: application/json
+HTTP/1.1 
 
+404 Not_Found
+
+```
 {
-    "error": "Authorization failure !!..Please Check Username Or Password"
+    "Invalid Username"
 }
+```
 
-If the username is not matched, the API returns an error message:
+  -  If the username and passowrd both not matched, the API returns an error message:
 
-HTTP/1.1 404 Not_Found
-Content-Type: application/json
+HTTP/1.1 
 
+401 Unauthorized
+
+```
 {
-    "error": "Invalid Username"
+    "Authorization failure !!..Please Check Username Or Password"
 }
+```
+
+ - If the exception occours, the API returns an error message:
+
+HTTP/1.1 
+
+500 Internal Server Error
+
+```
+{
+    "Internal Server Error"
+}
+```
 
 
+B)
 
-POST /service/v1/review
-This API posts review to the server. if token authrization is sucessfull
+**POST /service/v1/review**
 
-Request
-POST /service/v1/review HTTP/1.1
+This API posts review to the server. if token authrization is successful.
+
+It will map review to user by using user_id and User_id is extracted from token.
+
+Also one user can have many reviews.
+
+
+> Request:
+
+POST /service/v1/review 
+
+HTTP/1.1
+
 Host: localhost:8081
+
 Content-Type: application/json
+
 Authorization: Bearer "Your_token_here"
 
+```
 {
 
     "review": "Your_review_here"
 }
+```
 
-Response
-If the request is successful, the API returns a success message:
+> Response:
 
-HTTP/1.1 200 OK
-Content-Type: application/json
+  - If the token validation fails, the API returns an status:
 
+HTTP/1.1 
+
+401 Unauthorized
+
+  - If the request is successful, the API returns a success message
+
+HTTP/1.1 
+
+200 OK
+
+```
 {
-    "message": "Review created Successfully.."
+    "Review created Successfully.."
 }
+```
 
-If the token validation fails, the API returns an message:
+ - If the exception occours, the API returns an error message:
 
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 
 
-If the exception occours, the API returns an error message:
+500 Internal Server Error
 
-HTTP/1.1 500 Internal Server Error
-
+```
 {
-    "error": "Internal Server Error"
+   "Internal Server Error"
 }
+```
 
 
+**GET /service/v1/review/{id}**
 
-GET /service/v1/review/{id}
-This API returns reviews based on user ID. if token authrization is successfull
+This API returns reviews based on user ID. if token authrization is successfull.
 
-Request
-GET /service/v1/review/{id} HTTP/1.1
+It will also check given id and id extracted from token is same or not.
+
+Also one user can have many reviews.
+
+> Request:
+
+GET /service/v1/review/{id} 
+
+HTTP/1.1
+
 Host: localhost:8081
+
 Content-Type: application/json
+
 Authorization: Bearer "Your_token_here"
 
-{
 
-    "review": "this is sample review",
-    
-}
+> Response:
 
-Response
+  - If the request is successful, the API returns a success message:
 
-If the request is successful, the API returns a success message:
+HTTP/1.1 
 
-HTTP/1.1 200 OK
+200 OK
+
 Content-Type: application/json
 
+```
 {
     "review1": "this is sample review1",
     "review2": "this is sample review2"
 }
+```
 
-If the token is not matched for given id, the API returns a error message:
+  - If the token is not matched for given id, the API returns a error message:
 
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 
 
-If the token is not matched for given id, the API returns a error message:
+401 Unauthorized
 
-HTTP/1.1 401 Unauthorized
+  - If the token validation fails, the API returns an status:
 
-If the exception occours, the API returns an error message:
+HTTP/1.1 
 
-HTTP/1.1 500 Internal Server Error
+401 Unauthorized
 
-/service/v1/review
+- If the exception occours, the API returns an error message:
+
+HTTP/1.1 
+
+500 Internal Server Error
+
+```
+{
+    "Internal Server Error"
+}
+```
 
 
+**DELETE /service/v1/review**
 
-DELETE /service/v1/review
-This API delete reviews by user ID. id is decoded from token using JWT Token
+This API delete reviews by user ID.
 
-Request
-DELETE /service/v1/review HTTP/1.1
+User id is extracted from given token using JWT Token.
+
+if user have many reviews, all reviews of that user will be deleted.
+
+> Request:
+
+DELETE /service/v1/review 
+
+HTTP/1.1
+
 Host: localhost:8081
+
 Authorization: Bearer "Your_token_here"
 
 
-Response
+> Response:
 
-If the request is successful, the API returns a success message:
+  - If the request is successful, the API returns a success message:
 
-HTTP/1.1 200 OK
+HTTP/1.1 
 
+200 OK
+
+```
 {
     "Review Deleted Successfully.."
 }
+```
 
-If the token is valid, the API returns a error message:
+  - If the token is invalid or token validation fails, the API returns a error message:
 
-HTTP/1.1 401 Unauthorized
+HTTP/1.1 
 
-If the exception occours, the API returns an error message:
+401 Unauthorized
 
-HTTP/1.1 500 Internal Server Error
+- If the exception occours, the API returns an error message:
+
+HTTP/1.1 
+
+500 Internal Server Error
+
+```
+{
+    "Internal Server Error"
+}
+```
 
 
 
-Conclusion
+## Conclusion
 That's it! You can now use this Spring Boot application to generate a token and post data to the server. If you encounter any issues or have any questions, feel
 to contact me..
 
